@@ -1,0 +1,4 @@
+useDynLib(SenSpe, .registration = TRUE)
+
+importFrom("stats", "dbinom", "pbeta", "qnorm")
+export(snsp1m, snsp2mup, snsp2mp)

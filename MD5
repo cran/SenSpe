@@ -1,0 +1,9 @@
+66001790ef8fe1b6e56570d8334f1e8b *DESCRIPTION
+0093b66e47beb33f94fd0f9c1c14cd08 *NAMESPACE
+4496148e5d1405d5cdfa77917c8bf914 *R/snsp1m.R
+a33cd184ff8a5fff60ee1a1565f271e7 *R/snsp2m.R
+28d88699dedebe3aa2abf5ed4c82d672 *man/snsp1m.Rd
+246286ab781a50851eebb5f9a9caeabc *man/snsp2mp.Rd
+baf899cf8f9be9fcb136aaa7fe39f881 *man/snsp2mup.Rd
+e3bfa2db383a630872d1b219e85b5aa5 *src/SenSpe_init.c
+90e10fd4510f05343838a8c929a0149d *src/eb2mp.f
