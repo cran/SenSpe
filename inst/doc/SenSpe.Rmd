@@ -1,0 +1,73 @@
+---
+title: "Estimating Specificity at Controlled Sensitivity, or Vice Versa"
+author: "Yijian Huang (yhuang5@emory.edu)"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{Estimating Specificity at Controlled Sensitivity, or Vice Versa}
+  %\VignetteEngine{knitr::rmarkdown}
+  \usepackage[utf8]{inputenc}
+---
+
+```{r setup, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>"
+)
+```
+
+Package `SenSpe' considers biomarker evaluation and comparison in terms of
+specificity at a controlled sensitivity level, or sensitivity at a controlled
+specificity level. Point estimation and exact bootstrap of Huang, Parakati,
+Patil, and Sanda (2023) for the one- and two-biomarker problems are implemented.
+
+## Installation
+`SenSpe' is available on CRAN:
+```{r install, eval=FALSE, message=FALSE, warning=FALSE}
+install.packages("SenSpe")
+```
+
+## Estimating specificity at a controlled sensitivity level (or sensitivity at a controlled specificity level) with a single biomarker
+Perform point estimation and exact bootstrap-based inference, with a simulated dataset:
+```{r snsp1m, eval=TRUE, message=FALSE, warning=FALSE}
+library("SenSpe")
+## simulate biomarkers of 100 cases and 100 controls
+n1 <- 100
+n0 <- 100
+mk <- c(rnorm(n1,1,1),rnorm(n0,0,1))
+## estimate specificity at controlled 0.95 sensitivity
+snsp1m(mk, n1=n1, s0=0.95)
+```
+Function `snsp1m` outputs estimated threshold (`threshold`), estimated specificity at controlled sensitivity (or sensitivity at controlled
+specificity) (`hss`), exact bootstrap variance estimate for the performance
+metric (`hvar`) along with its components (`hvar1` and `hvar2`), exact bootstrap distribution (`btpdf`), Wald confidence intervals (`wald_ci`), percentile confidence interval (`pct_ci`), score confidence intervals (`scr_ci`), and exact bootstrap version of the BTII interval in Zhou and Qin (2005, Statistics in Medicine 24, pp 465–477) (`zq_ci`).
+
+## Two-biomarker paired comparison in specificity at a controlled sensitivity level (or sensitivity at a controlled specificity level)
+```{r snsp2mp, eval=TRUE, message=FALSE, warning=FALSE}
+## simulate paired biomarkers X and Y, with correlation 0.5, 100 cases and 100 controls
+n1 <- 100
+n0 <- 100
+rho <- 0.5
+mkx <- rnorm(n1+n0,0,1)
+mky <- rho*mkx + sqrt(1-rho^2)*rnorm(n1+n0,0,1)
+mkx <- mkx + c(rep(2,n1),rep(0,n0))
+mky <- mky + c(rep(1,n1),rep(0,n0))
+mk <- rbind(mkx,mky)
+## compare specificity at controlled 0.95 sensitivity
+snsp2mp(mk, 100, 0.95)
+```
+Function `snsp2mp` outputs estimated differences (`diff`), exact bootstrap
+mean of the empirical difference (`btmn`), exact bootstrap variance estimate for the empirical difference (`btva`), exact bootstrap distribution of the empirical difference (`btdist`), Wald confidence intervals (`wald_ci`), percentile confidence interval (`pct_ci`), score confidence intervals (`scr_ci`), and an extension of the BTII interval in Zhou and Qin (2005, Statistics in Medicine 24, pp 465–477) (`zq_ci`).
+
+## Two-biomarker unpaired comparison in specificity at a controlled sensitivity level (or sensitivity at a controlled specificity level)
+```{r snsp2mup, eval=TRUE, message=FALSE, warning=FALSE}
+## simulate biomarker X with 100 cases and 100 controls
+mkx <- c(rnorm(100,2,1),rnorm(100,0,1))
+## simulate biomarker Y with 100 cases and 100 controls
+mky <- c(rnorm(100,1,1),rnorm(100,0,1))
+## compare specificity at controlled 0.95 sensitivity
+snsp2mup(mkx, 100, mky, 100, 0.95)
+```
+Function `snsp2mup` outputs estimated differences (`diff`), exact bootstrap variance estimate for the empirical difference (`hvar`), Wald confidence intervals (`wald_ci`), percentile confidence interval (`pct_ci`), score confidence intervals (`scr_ci`), and an extension of the BTII interval in Zhou and Qin (2005, Statistics in Medicine 24, pp 465–477) (`zq_ci`).
+
+## References
+Huang, Y., Parakati, I., Patil, D. H.,and Sanda, M. G. (2023). Interval estimation for operating characteristic of continuous biomarkers with controlled sensitivity or specificity, _Statistica Sinica_ 33, 193–214.

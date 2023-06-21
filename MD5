@@ -1,9 +1,14 @@
-66001790ef8fe1b6e56570d8334f1e8b *DESCRIPTION
+0145c2d3856a3eaf01536f83f4d66815 *DESCRIPTION
 0093b66e47beb33f94fd0f9c1c14cd08 *NAMESPACE
 4496148e5d1405d5cdfa77917c8bf914 *R/snsp1m.R
 a33cd184ff8a5fff60ee1a1565f271e7 *R/snsp2m.R
+0fb8d81848555db04a3af84e99220b3c *build/vignette.rds
+2408da00711f0d621c46e659f0925a36 *inst/doc/SenSpe.R
+43d5660d7e0e7cb1e921125b40e0202d *inst/doc/SenSpe.Rmd
+d1b22122bada4d2f523c359e0d4882d5 *inst/doc/SenSpe.html
 28d88699dedebe3aa2abf5ed4c82d672 *man/snsp1m.Rd
 246286ab781a50851eebb5f9a9caeabc *man/snsp2mp.Rd
 baf899cf8f9be9fcb136aaa7fe39f881 *man/snsp2mup.Rd
 e3bfa2db383a630872d1b219e85b5aa5 *src/SenSpe_init.c
 90e10fd4510f05343838a8c929a0149d *src/eb2mp.f
+43d5660d7e0e7cb1e921125b40e0202d *vignettes/SenSpe.Rmd

@@ -1,0 +1,589 @@
+<!DOCTYPE html>
+
+<html>
+
+<head>
+
+<meta charset="utf-8" />
+<meta name="generator" content="pandoc" />
+<meta http-equiv="X-UA-Compatible" content="IE=EDGE" />
+
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+
+<meta name="author" content="Yijian Huang (yhuang5@emory.edu)" />
+
+
+<title>Estimating Specificity at Controlled Sensitivity, or Vice Versa</title>
+
+<script>// Pandoc 2.9 adds attributes on both header and div. We remove the former (to
+// be compatible with the behavior of Pandoc < 2.8).
+document.addEventListener('DOMContentLoaded', function(e) {
+  var hs = document.querySelectorAll("div.section[class*='level'] > :first-child");
+  var i, h, a;
+  for (i = 0; i < hs.length; i++) {
+    h = hs[i];
+    if (!/^h[1-6]$/i.test(h.tagName)) continue;  // it should be a header h1-h6
+    a = h.attributes;
+    while (a.length > 0) h.removeAttribute(a[0].name);
+  }
+});
+</script>
+
+<style type="text/css">
+code{white-space: pre-wrap;}
+span.smallcaps{font-variant: small-caps;}
+span.underline{text-decoration: underline;}
+div.column{display: inline-block; vertical-align: top; width: 50%;}
+div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+ul.task-list{list-style: none;}
+</style>
+
+
+
+<style type="text/css">
+code {
+white-space: pre;
+}
+.sourceCode {
+overflow: visible;
+}
+</style>
+<style type="text/css" data-origin="pandoc">
+pre > code.sourceCode { white-space: pre; position: relative; }
+pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
+pre > code.sourceCode > span:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
+div.sourceCode { margin: 1em 0; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+pre > code.sourceCode { white-space: pre-wrap; }
+pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+}
+pre.numberSource code
+{ counter-reset: source-line 0; }
+pre.numberSource code > span
+{ position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+{ content: counter(source-line);
+position: relative; left: -1em; text-align: right; vertical-align: baseline;
+border: none; display: inline-block;
+-webkit-touch-callout: none; -webkit-user-select: none;
+-khtml-user-select: none; -moz-user-select: none;
+-ms-user-select: none; user-select: none;
+padding: 0 4px; width: 4em;
+color: #aaaaaa;
+}
+pre.numberSource { margin-left: 3em; border-left: 1px solid #aaaaaa; padding-left: 4px; }
+div.sourceCode
+{ }
+@media screen {
+pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+}
+code span.al { color: #ff0000; font-weight: bold; } 
+code span.an { color: #60a0b0; font-weight: bold; font-style: italic; } 
+code span.at { color: #7d9029; } 
+code span.bn { color: #40a070; } 
+code span.bu { color: #008000; } 
+code span.cf { color: #007020; font-weight: bold; } 
+code span.ch { color: #4070a0; } 
+code span.cn { color: #880000; } 
+code span.co { color: #60a0b0; font-style: italic; } 
+code span.cv { color: #60a0b0; font-weight: bold; font-style: italic; } 
+code span.do { color: #ba2121; font-style: italic; } 
+code span.dt { color: #902000; } 
+code span.dv { color: #40a070; } 
+code span.er { color: #ff0000; font-weight: bold; } 
+code span.ex { } 
+code span.fl { color: #40a070; } 
+code span.fu { color: #06287e; } 
+code span.im { color: #008000; font-weight: bold; } 
+code span.in { color: #60a0b0; font-weight: bold; font-style: italic; } 
+code span.kw { color: #007020; font-weight: bold; } 
+code span.op { color: #666666; } 
+code span.ot { color: #007020; } 
+code span.pp { color: #bc7a00; } 
+code span.sc { color: #4070a0; } 
+code span.ss { color: #bb6688; } 
+code span.st { color: #4070a0; } 
+code span.va { color: #19177c; } 
+code span.vs { color: #4070a0; } 
+code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } 
+</style>
+<script>
+// apply pandoc div.sourceCode style to pre.sourceCode instead
+(function() {
+  var sheets = document.styleSheets;
+  for (var i = 0; i < sheets.length; i++) {
+    if (sheets[i].ownerNode.dataset["origin"] !== "pandoc") continue;
+    try { var rules = sheets[i].cssRules; } catch (e) { continue; }
+    var j = 0;
+    while (j < rules.length) {
+      var rule = rules[j];
+      // check if there is a div.sourceCode rule
+      if (rule.type !== rule.STYLE_RULE || rule.selectorText !== "div.sourceCode") {
+        j++;
+        continue;
+      }
+      var style = rule.style.cssText;
+      // check if color or background-color is set
+      if (rule.style.color === '' && rule.style.backgroundColor === '') {
+        j++;
+        continue;
+      }
+      // replace div.sourceCode by a pre.sourceCode rule
+      sheets[i].deleteRule(j);
+      sheets[i].insertRule('pre.sourceCode{' + style + '}', j);
+    }
+  }
+})();
+</script>
+
+
+
+
+<style type="text/css">body {
+background-color: #fff;
+margin: 1em auto;
+max-width: 700px;
+overflow: visible;
+padding-left: 2em;
+padding-right: 2em;
+font-family: "Open Sans", "Helvetica Neue", Helvetica, Arial, sans-serif;
+font-size: 14px;
+line-height: 1.35;
+}
+#TOC {
+clear: both;
+margin: 0 0 10px 10px;
+padding: 4px;
+width: 400px;
+border: 1px solid #CCCCCC;
+border-radius: 5px;
+background-color: #f6f6f6;
+font-size: 13px;
+line-height: 1.3;
+}
+#TOC .toctitle {
+font-weight: bold;
+font-size: 15px;
+margin-left: 5px;
+}
+#TOC ul {
+padding-left: 40px;
+margin-left: -1.5em;
+margin-top: 5px;
+margin-bottom: 5px;
+}
+#TOC ul ul {
+margin-left: -2em;
+}
+#TOC li {
+line-height: 16px;
+}
+table {
+margin: 1em auto;
+border-width: 1px;
+border-color: #DDDDDD;
+border-style: outset;
+border-collapse: collapse;
+}
+table th {
+border-width: 2px;
+padding: 5px;
+border-style: inset;
+}
+table td {
+border-width: 1px;
+border-style: inset;
+line-height: 18px;
+padding: 5px 5px;
+}
+table, table th, table td {
+border-left-style: none;
+border-right-style: none;
+}
+table thead, table tr.even {
+background-color: #f7f7f7;
+}
+p {
+margin: 0.5em 0;
+}
+blockquote {
+background-color: #f6f6f6;
+padding: 0.25em 0.75em;
+}
+hr {
+border-style: solid;
+border: none;
+border-top: 1px solid #777;
+margin: 28px 0;
+}
+dl {
+margin-left: 0;
+}
+dl dd {
+margin-bottom: 13px;
+margin-left: 13px;
+}
+dl dt {
+font-weight: bold;
+}
+ul {
+margin-top: 0;
+}
+ul li {
+list-style: circle outside;
+}
+ul ul {
+margin-bottom: 0;
+}
+pre, code {
+background-color: #f7f7f7;
+border-radius: 3px;
+color: #333;
+white-space: pre-wrap; 
+}
+pre {
+border-radius: 3px;
+margin: 5px 0px 10px 0px;
+padding: 10px;
+}
+pre:not([class]) {
+background-color: #f7f7f7;
+}
+code {
+font-family: Consolas, Monaco, 'Courier New', monospace;
+font-size: 85%;
+}
+p > code, li > code {
+padding: 2px 0px;
+}
+div.figure {
+text-align: center;
+}
+img {
+background-color: #FFFFFF;
+padding: 2px;
+border: 1px solid #DDDDDD;
+border-radius: 3px;
+border: 1px solid #CCCCCC;
+margin: 0 5px;
+}
+h1 {
+margin-top: 0;
+font-size: 35px;
+line-height: 40px;
+}
+h2 {
+border-bottom: 4px solid #f7f7f7;
+padding-top: 10px;
+padding-bottom: 2px;
+font-size: 145%;
+}
+h3 {
+border-bottom: 2px solid #f7f7f7;
+padding-top: 10px;
+font-size: 120%;
+}
+h4 {
+border-bottom: 1px solid #f7f7f7;
+margin-left: 8px;
+font-size: 105%;
+}
+h5, h6 {
+border-bottom: 1px solid #ccc;
+font-size: 105%;
+}
+a {
+color: #0033dd;
+text-decoration: none;
+}
+a:hover {
+color: #6666ff; }
+a:visited {
+color: #800080; }
+a:visited:hover {
+color: #BB00BB; }
+a[href^="http:"] {
+text-decoration: underline; }
+a[href^="https:"] {
+text-decoration: underline; }
+
+code > span.kw { color: #555; font-weight: bold; } 
+code > span.dt { color: #902000; } 
+code > span.dv { color: #40a070; } 
+code > span.bn { color: #d14; } 
+code > span.fl { color: #d14; } 
+code > span.ch { color: #d14; } 
+code > span.st { color: #d14; } 
+code > span.co { color: #888888; font-style: italic; } 
+code > span.ot { color: #007020; } 
+code > span.al { color: #ff0000; font-weight: bold; } 
+code > span.fu { color: #900; font-weight: bold; } 
+code > span.er { color: #a61717; background-color: #e3d2d2; } 
+</style>
+
+
+
+
+</head>
+
+<body>
+
+
+
+
+<h1 class="title toc-ignore">Estimating Specificity at Controlled
+Sensitivity, or Vice Versa</h1>
+<h4 class="author">Yijian Huang (<a href="mailto:yhuang5@emory.edu" class="email">yhuang5@emory.edu</a>)</h4>
+
+
+
+<p>Package `SenSpe’ considers biomarker evaluation and comparison in
+terms of specificity at a controlled sensitivity level, or sensitivity
+at a controlled specificity level. Point estimation and exact bootstrap
+of Huang, Parakati, Patil, and Sanda (2023) for the one- and
+two-biomarker problems are implemented.</p>
+<div id="installation" class="section level2">
+<h2>Installation</h2>
+<p>`SenSpe’ is available on CRAN:</p>
+<div class="sourceCode" id="cb1"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" tabindex="-1"></a><span class="fu">install.packages</span>(<span class="st">&quot;SenSpe&quot;</span>)</span></code></pre></div>
+</div>
+<div id="estimating-specificity-at-a-controlled-sensitivity-level-or-sensitivity-at-a-controlled-specificity-level-with-a-single-biomarker" class="section level2">
+<h2>Estimating specificity at a controlled sensitivity level (or
+sensitivity at a controlled specificity level) with a single
+biomarker</h2>
+<p>Perform point estimation and exact bootstrap-based inference, with a
+simulated dataset:</p>
+<div class="sourceCode" id="cb2"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb2-1"><a href="#cb2-1" tabindex="-1"></a><span class="fu">library</span>(<span class="st">&quot;SenSpe&quot;</span>)</span>
+<span id="cb2-2"><a href="#cb2-2" tabindex="-1"></a><span class="do">## simulate biomarkers of 100 cases and 100 controls</span></span>
+<span id="cb2-3"><a href="#cb2-3" tabindex="-1"></a>n1 <span class="ot">&lt;-</span> <span class="dv">100</span></span>
+<span id="cb2-4"><a href="#cb2-4" tabindex="-1"></a>n0 <span class="ot">&lt;-</span> <span class="dv">100</span></span>
+<span id="cb2-5"><a href="#cb2-5" tabindex="-1"></a>mk <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="fu">rnorm</span>(n1,<span class="dv">1</span>,<span class="dv">1</span>),<span class="fu">rnorm</span>(n0,<span class="dv">0</span>,<span class="dv">1</span>))</span>
+<span id="cb2-6"><a href="#cb2-6" tabindex="-1"></a><span class="do">## estimate specificity at controlled 0.95 sensitivity</span></span>
+<span id="cb2-7"><a href="#cb2-7" tabindex="-1"></a><span class="fu">snsp1m</span>(mk, <span class="at">n1=</span>n1, <span class="at">s0=</span><span class="fl">0.95</span>)</span>
+<span id="cb2-8"><a href="#cb2-8" tabindex="-1"></a><span class="co">#&gt; $threshold</span></span>
+<span id="cb2-9"><a href="#cb2-9" tabindex="-1"></a><span class="co">#&gt; [1] -0.5944202</span></span>
+<span id="cb2-10"><a href="#cb2-10" tabindex="-1"></a><span class="co">#&gt; </span></span>
+<span id="cb2-11"><a href="#cb2-11" tabindex="-1"></a><span class="co">#&gt; $hss</span></span>
+<span id="cb2-12"><a href="#cb2-12" tabindex="-1"></a><span class="co">#&gt; [1] 0.3400 0.2925</span></span>
+<span id="cb2-13"><a href="#cb2-13" tabindex="-1"></a><span class="co">#&gt; </span></span>
+<span id="cb2-14"><a href="#cb2-14" tabindex="-1"></a><span class="co">#&gt; $hvar1</span></span>
+<span id="cb2-15"><a href="#cb2-15" tabindex="-1"></a><span class="co">#&gt; [1] 0.007611107</span></span>
+<span id="cb2-16"><a href="#cb2-16" tabindex="-1"></a><span class="co">#&gt; </span></span>
+<span id="cb2-17"><a href="#cb2-17" tabindex="-1"></a><span class="co">#&gt; $hvar2</span></span>
+<span id="cb2-18"><a href="#cb2-18" tabindex="-1"></a><span class="co">#&gt; [1] 0.002065614</span></span>
+<span id="cb2-19"><a href="#cb2-19" tabindex="-1"></a><span class="co">#&gt; </span></span>
+<span id="cb2-20"><a href="#cb2-20" tabindex="-1"></a><span class="co">#&gt; $hvar</span></span>
+<span id="cb2-21"><a href="#cb2-21" tabindex="-1"></a><span class="co">#&gt; [1] 0.009676721</span></span>
+<span id="cb2-22"><a href="#cb2-22" tabindex="-1"></a><span class="co">#&gt; </span></span>
+<span id="cb2-23"><a href="#cb2-23" tabindex="-1"></a><span class="co">#&gt; $btpdf</span></span>
+<span id="cb2-24"><a href="#cb2-24" tabindex="-1"></a><span class="co">#&gt;   [1] 1.165859e-05 8.665900e-05 3.202204e-04 7.861107e-04 1.450055e-03</span></span>
+<span id="cb2-25"><a href="#cb2-25" tabindex="-1"></a><span class="co">#&gt;   [6] 2.168418e-03 2.800422e-03 3.336233e-03 3.924578e-03 4.781351e-03</span></span>
+<span id="cb2-26"><a href="#cb2-26" tabindex="-1"></a><span class="co">#&gt;  [11] 6.058350e-03 7.763404e-03 9.765462e-03 1.185634e-02 1.381870e-02</span></span>
+<span id="cb2-27"><a href="#cb2-27" tabindex="-1"></a><span class="co">#&gt;  [16] 1.546811e-02 1.666853e-02 1.733978e-02 1.747240e-02 1.714796e-02</span></span>
+<span id="cb2-28"><a href="#cb2-28" tabindex="-1"></a><span class="co">#&gt;  [21] 1.654970e-02 1.594747e-02 1.565378e-02 1.596296e-02 1.709386e-02</span></span>
+<span id="cb2-29"><a href="#cb2-29" tabindex="-1"></a><span class="co">#&gt;  [26] 1.915339e-02 2.212782e-02 2.589635e-02 3.025507e-02 3.493968e-02</span></span>
+<span id="cb2-30"><a href="#cb2-30" tabindex="-1"></a><span class="co">#&gt;  [31] 3.964203e-02 4.402314e-02 4.773031e-02 5.042539e-02 5.182507e-02</span></span>
+<span id="cb2-31"><a href="#cb2-31" tabindex="-1"></a><span class="co">#&gt;  [36] 5.174636e-02 5.014466e-02 4.713113e-02 4.296125e-02 3.799523e-02</span></span>
+<span id="cb2-32"><a href="#cb2-32" tabindex="-1"></a><span class="co">#&gt;  [41] 3.263974e-02 2.728549e-02 2.225555e-02 1.777423e-02 1.395991e-02</span></span>
+<span id="cb2-33"><a href="#cb2-33" tabindex="-1"></a><span class="co">#&gt;  [46] 1.083790e-02 8.365486e-03 6.460344e-03 5.025130e-03 3.964441e-03</span></span>
+<span id="cb2-34"><a href="#cb2-34" tabindex="-1"></a><span class="co">#&gt;  [51] 3.193660e-03 2.641490e-03 2.248951e-03 1.967341e-03 1.756741e-03</span></span>
+<span id="cb2-35"><a href="#cb2-35" tabindex="-1"></a><span class="co">#&gt;  [56] 1.585504e-03 1.430417e-03 1.276824e-03 1.118138e-03 9.544761e-04</span></span>
+<span id="cb2-36"><a href="#cb2-36" tabindex="-1"></a><span class="co">#&gt;  [61] 7.905603e-04 6.333147e-04 4.896556e-04 3.648797e-04 2.618396e-04</span></span>
+<span id="cb2-37"><a href="#cb2-37" tabindex="-1"></a><span class="co">#&gt;  [66] 1.808692e-04 1.202532e-04 7.696923e-05 4.744956e-05 2.819515e-05</span></span>
+<span id="cb2-38"><a href="#cb2-38" tabindex="-1"></a><span class="co">#&gt;  [71] 1.616632e-05 8.956771e-06 4.803356e-06 2.498380e-06 1.263064e-06</span></span>
+<span id="cb2-39"><a href="#cb2-39" tabindex="-1"></a><span class="co">#&gt;  [76] 6.219393e-07 2.987883e-07 1.401799e-07 6.421904e-08 2.868921e-08</span></span>
+<span id="cb2-40"><a href="#cb2-40" tabindex="-1"></a><span class="co">#&gt;  [81] 1.246836e-08 5.256467e-09 2.145140e-09 8.480735e-10 3.271422e-10</span></span>
+<span id="cb2-41"><a href="#cb2-41" tabindex="-1"></a><span class="co">#&gt;  [86] 1.253700e-10 4.921327e-11 2.044714e-11 9.085648e-12 4.205512e-12</span></span>
+<span id="cb2-42"><a href="#cb2-42" tabindex="-1"></a><span class="co">#&gt;  [91] 1.934359e-12 8.457654e-13 3.401798e-13 1.228892e-13 3.906983e-14</span></span>
+<span id="cb2-43"><a href="#cb2-43" tabindex="-1"></a><span class="co">#&gt;  [96] 1.070101e-14 2.458152e-15 4.557192e-16 6.409974e-17 6.096199e-18</span></span>
+<span id="cb2-44"><a href="#cb2-44" tabindex="-1"></a><span class="co">#&gt; [101] 2.945929e-19</span></span>
+<span id="cb2-45"><a href="#cb2-45" tabindex="-1"></a><span class="co">#&gt; </span></span>
+<span id="cb2-46"><a href="#cb2-46" tabindex="-1"></a><span class="co">#&gt; $wald_ci</span></span>
+<span id="cb2-47"><a href="#cb2-47" tabindex="-1"></a><span class="co">#&gt;            [,1]      [,2]</span></span>
+<span id="cb2-48"><a href="#cb2-48" tabindex="-1"></a><span class="co">#&gt; [1,] 0.14719771 0.5328023</span></span>
+<span id="cb2-49"><a href="#cb2-49" tabindex="-1"></a><span class="co">#&gt; [2,] 0.09969771 0.4853023</span></span>
+<span id="cb2-50"><a href="#cb2-50" tabindex="-1"></a><span class="co">#&gt; </span></span>
+<span id="cb2-51"><a href="#cb2-51" tabindex="-1"></a><span class="co">#&gt; $pct_ci</span></span>
+<span id="cb2-52"><a href="#cb2-52" tabindex="-1"></a><span class="co">#&gt; [1] 0.10 0.49</span></span>
+<span id="cb2-53"><a href="#cb2-53" tabindex="-1"></a><span class="co">#&gt; </span></span>
+<span id="cb2-54"><a href="#cb2-54" tabindex="-1"></a><span class="co">#&gt; $scr_ci</span></span>
+<span id="cb2-55"><a href="#cb2-55" tabindex="-1"></a><span class="co">#&gt;           [,1]      [,2]</span></span>
+<span id="cb2-56"><a href="#cb2-56" tabindex="-1"></a><span class="co">#&gt; [1,] 0.1778024 0.5510019</span></span>
+<span id="cb2-57"><a href="#cb2-57" tabindex="-1"></a><span class="co">#&gt; [2,] 0.1436938 0.5045993</span></span>
+<span id="cb2-58"><a href="#cb2-58" tabindex="-1"></a><span class="co">#&gt; </span></span>
+<span id="cb2-59"><a href="#cb2-59" tabindex="-1"></a><span class="co">#&gt; $zq_ci</span></span>
+<span id="cb2-60"><a href="#cb2-60" tabindex="-1"></a><span class="co">#&gt; [1] 0.1320508 0.5033905</span></span></code></pre></div>
+<p>Function <code>snsp1m</code> outputs estimated threshold
+(<code>threshold</code>), estimated specificity at controlled
+sensitivity (or sensitivity at controlled specificity)
+(<code>hss</code>), exact bootstrap variance estimate for the
+performance metric (<code>hvar</code>) along with its components
+(<code>hvar1</code> and <code>hvar2</code>), exact bootstrap
+distribution (<code>btpdf</code>), Wald confidence intervals
+(<code>wald_ci</code>), percentile confidence interval
+(<code>pct_ci</code>), score confidence intervals (<code>scr_ci</code>),
+and exact bootstrap version of the BTII interval in Zhou and Qin (2005,
+Statistics in Medicine 24, pp 465–477) (<code>zq_ci</code>).</p>
+</div>
+<div id="two-biomarker-paired-comparison-in-specificity-at-a-controlled-sensitivity-level-or-sensitivity-at-a-controlled-specificity-level" class="section level2">
+<h2>Two-biomarker paired comparison in specificity at a controlled
+sensitivity level (or sensitivity at a controlled specificity
+level)</h2>
+<div class="sourceCode" id="cb3"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb3-1"><a href="#cb3-1" tabindex="-1"></a><span class="do">## simulate paired biomarkers X and Y, with correlation 0.5, 100 cases and 100 controls</span></span>
+<span id="cb3-2"><a href="#cb3-2" tabindex="-1"></a>n1 <span class="ot">&lt;-</span> <span class="dv">100</span></span>
+<span id="cb3-3"><a href="#cb3-3" tabindex="-1"></a>n0 <span class="ot">&lt;-</span> <span class="dv">100</span></span>
+<span id="cb3-4"><a href="#cb3-4" tabindex="-1"></a>rho <span class="ot">&lt;-</span> <span class="fl">0.5</span></span>
+<span id="cb3-5"><a href="#cb3-5" tabindex="-1"></a>mkx <span class="ot">&lt;-</span> <span class="fu">rnorm</span>(n1<span class="sc">+</span>n0,<span class="dv">0</span>,<span class="dv">1</span>)</span>
+<span id="cb3-6"><a href="#cb3-6" tabindex="-1"></a>mky <span class="ot">&lt;-</span> rho<span class="sc">*</span>mkx <span class="sc">+</span> <span class="fu">sqrt</span>(<span class="dv">1</span><span class="sc">-</span>rho<span class="sc">^</span><span class="dv">2</span>)<span class="sc">*</span><span class="fu">rnorm</span>(n1<span class="sc">+</span>n0,<span class="dv">0</span>,<span class="dv">1</span>)</span>
+<span id="cb3-7"><a href="#cb3-7" tabindex="-1"></a>mkx <span class="ot">&lt;-</span> mkx <span class="sc">+</span> <span class="fu">c</span>(<span class="fu">rep</span>(<span class="dv">2</span>,n1),<span class="fu">rep</span>(<span class="dv">0</span>,n0))</span>
+<span id="cb3-8"><a href="#cb3-8" tabindex="-1"></a>mky <span class="ot">&lt;-</span> mky <span class="sc">+</span> <span class="fu">c</span>(<span class="fu">rep</span>(<span class="dv">1</span>,n1),<span class="fu">rep</span>(<span class="dv">0</span>,n0))</span>
+<span id="cb3-9"><a href="#cb3-9" tabindex="-1"></a>mk <span class="ot">&lt;-</span> <span class="fu">rbind</span>(mkx,mky)</span>
+<span id="cb3-10"><a href="#cb3-10" tabindex="-1"></a><span class="do">## compare specificity at controlled 0.95 sensitivity</span></span>
+<span id="cb3-11"><a href="#cb3-11" tabindex="-1"></a><span class="fu">snsp2mp</span>(mk, <span class="dv">100</span>, <span class="fl">0.95</span>)</span>
+<span id="cb3-12"><a href="#cb3-12" tabindex="-1"></a><span class="co">#&gt; $diff</span></span>
+<span id="cb3-13"><a href="#cb3-13" tabindex="-1"></a><span class="co">#&gt; [1] 0.370 0.446</span></span>
+<span id="cb3-14"><a href="#cb3-14" tabindex="-1"></a><span class="co">#&gt; </span></span>
+<span id="cb3-15"><a href="#cb3-15" tabindex="-1"></a><span class="co">#&gt; $btmn</span></span>
+<span id="cb3-16"><a href="#cb3-16" tabindex="-1"></a><span class="co">#&gt; [1] 0.4048261</span></span>
+<span id="cb3-17"><a href="#cb3-17" tabindex="-1"></a><span class="co">#&gt; </span></span>
+<span id="cb3-18"><a href="#cb3-18" tabindex="-1"></a><span class="co">#&gt; $btva</span></span>
+<span id="cb3-19"><a href="#cb3-19" tabindex="-1"></a><span class="co">#&gt; [1] 0.01669198</span></span>
+<span id="cb3-20"><a href="#cb3-20" tabindex="-1"></a><span class="co">#&gt; </span></span>
+<span id="cb3-21"><a href="#cb3-21" tabindex="-1"></a><span class="co">#&gt; $btdist</span></span>
+<span id="cb3-22"><a href="#cb3-22" tabindex="-1"></a><span class="co">#&gt;   [1] 5.609873e-74 1.636547e-71 2.365895e-69 2.259762e-67 1.604178e-65</span></span>
+<span id="cb3-23"><a href="#cb3-23" tabindex="-1"></a><span class="co">#&gt;   [6] 9.027414e-64 4.194620e-62 1.655174e-60 5.661601e-59 1.705247e-57</span></span>
+<span id="cb3-24"><a href="#cb3-24" tabindex="-1"></a><span class="co">#&gt;  [11] 4.578782e-56 1.107030e-54 2.429890e-53 4.875560e-52 8.995318e-51</span></span>
+<span id="cb3-25"><a href="#cb3-25" tabindex="-1"></a><span class="co">#&gt;  [16] 1.533733e-49 2.427304e-48 3.579353e-47 4.934699e-46 6.379687e-45</span></span>
+<span id="cb3-26"><a href="#cb3-26" tabindex="-1"></a><span class="co">#&gt;  [21] 7.755133e-44 8.885481e-43 9.616645e-42 9.850955e-41 9.568185e-40</span></span>
+<span id="cb3-27"><a href="#cb3-27" tabindex="-1"></a><span class="co">#&gt;  [26] 8.826619e-39 7.745158e-38 6.473545e-37 5.160456e-36 3.928114e-35</span></span>
+<span id="cb3-28"><a href="#cb3-28" tabindex="-1"></a><span class="co">#&gt;  [31] 2.858305e-34 1.990245e-33 1.327370e-32 8.486958e-32 5.206532e-31</span></span>
+<span id="cb3-29"><a href="#cb3-29" tabindex="-1"></a><span class="co">#&gt;  [36] 3.067052e-30 1.736158e-29 9.450493e-29 4.949960e-28 2.496328e-27</span></span>
+<span id="cb3-30"><a href="#cb3-30" tabindex="-1"></a><span class="co">#&gt;  [41] 1.212865e-26 5.680431e-26 2.565938e-25 1.118504e-24 4.707395e-24</span></span>
+<span id="cb3-31"><a href="#cb3-31" tabindex="-1"></a><span class="co">#&gt;  [46] 1.913799e-23 7.519757e-23 2.857080e-22 1.050204e-21 3.736654e-21</span></span>
+<span id="cb3-32"><a href="#cb3-32" tabindex="-1"></a><span class="co">#&gt;  [51] 1.287602e-20 4.299420e-20 1.391926e-19 4.371803e-19 1.332949e-18</span></span>
+<span id="cb3-33"><a href="#cb3-33" tabindex="-1"></a><span class="co">#&gt;  [56] 3.947805e-18 1.136519e-17 3.182520e-17 8.674280e-17 2.302776e-16</span></span>
+<span id="cb3-34"><a href="#cb3-34" tabindex="-1"></a><span class="co">#&gt;  [61] 5.957974e-16 1.503221e-15 3.700314e-15 8.890337e-15 2.085380e-14</span></span>
+<span id="cb3-35"><a href="#cb3-35" tabindex="-1"></a><span class="co">#&gt;  [66] 4.776531e-14 1.068380e-13 2.333526e-13 4.976727e-13 1.036335e-12</span></span>
+<span id="cb3-36"><a href="#cb3-36" tabindex="-1"></a><span class="co">#&gt;  [71] 2.107249e-12 4.185399e-12 8.126452e-12 1.544700e-11 2.881606e-11</span></span>
+<span id="cb3-37"><a href="#cb3-37" tabindex="-1"></a><span class="co">#&gt;  [76] 5.295669e-11 9.639546e-11 1.750298e-10 3.196249e-10 5.916920e-10</span></span>
+<span id="cb3-38"><a href="#cb3-38" tabindex="-1"></a><span class="co">#&gt;  [81] 1.116790e-09 2.152912e-09 4.227184e-09 8.401143e-09 1.677041e-08</span></span>
+<span id="cb3-39"><a href="#cb3-39" tabindex="-1"></a><span class="co">#&gt;  [86] 3.337883e-08 6.584491e-08 1.281803e-07 2.455524e-07 4.621336e-07</span></span>
+<span id="cb3-40"><a href="#cb3-40" tabindex="-1"></a><span class="co">#&gt;  [91] 8.537170e-07 1.547446e-06 2.751750e-06 4.800176e-06 8.212935e-06</span></span>
+<span id="cb3-41"><a href="#cb3-41" tabindex="-1"></a><span class="co">#&gt;  [96] 1.377896e-05 2.265848e-05 3.650083e-05 5.756417e-05 8.881416e-05</span></span>
+<span id="cb3-42"><a href="#cb3-42" tabindex="-1"></a><span class="co">#&gt; [101] 1.339692e-04 1.974553e-04 2.842387e-04 3.995223e-04 5.483232e-04</span></span>
+<span id="cb3-43"><a href="#cb3-43" tabindex="-1"></a><span class="co">#&gt; [106] 7.349961e-04 9.628010e-04 1.233647e-03 1.548128e-03 1.905926e-03</span></span>
+<span id="cb3-44"><a href="#cb3-44" tabindex="-1"></a><span class="co">#&gt; [111] 2.306555e-03 2.750312e-03 3.239215e-03 3.777621e-03 4.372255e-03</span></span>
+<span id="cb3-45"><a href="#cb3-45" tabindex="-1"></a><span class="co">#&gt; [116] 5.031497e-03 5.763913e-03 6.576267e-03 7.471421e-03 8.446638e-03</span></span>
+<span id="cb3-46"><a href="#cb3-46" tabindex="-1"></a><span class="co">#&gt; [121] 9.492825e-03 1.059509e-02 1.173467e-02 1.289206e-02 1.405053e-02</span></span>
+<span id="cb3-47"><a href="#cb3-47" tabindex="-1"></a><span class="co">#&gt; [126] 1.519943e-02 1.633604e-02 1.746548e-02 1.859840e-02 1.974665e-02</span></span>
+<span id="cb3-48"><a href="#cb3-48" tabindex="-1"></a><span class="co">#&gt; [131] 2.091811e-02 2.211188e-02 2.331520e-02 2.450307e-02 2.564090e-02</span></span>
+<span id="cb3-49"><a href="#cb3-49" tabindex="-1"></a><span class="co">#&gt; [136] 2.668946e-02 2.761111e-02 2.837559e-02 2.896402e-02 2.937027e-02</span></span>
+<span id="cb3-50"><a href="#cb3-50" tabindex="-1"></a><span class="co">#&gt; [141] 2.959948e-02 2.966443e-02 2.958086e-02 2.936307e-02 2.902087e-02</span></span>
+<span id="cb3-51"><a href="#cb3-51" tabindex="-1"></a><span class="co">#&gt; [146] 2.855855e-02 2.797576e-02 2.727004e-02 2.643992e-02 2.548783e-02</span></span>
+<span id="cb3-52"><a href="#cb3-52" tabindex="-1"></a><span class="co">#&gt; [151] 2.442195e-02 2.325662e-02 2.201124e-02 2.070806e-02 1.936933e-02</span></span>
+<span id="cb3-53"><a href="#cb3-53" tabindex="-1"></a><span class="co">#&gt; [156] 1.801478e-02 1.665975e-02 1.531459e-02 1.398532e-02 1.267524e-02</span></span>
+<span id="cb3-54"><a href="#cb3-54" tabindex="-1"></a><span class="co">#&gt; [161] 1.138710e-02 1.012510e-02 8.896311e-03 7.711106e-03 6.582569e-03</span></span>
+<span id="cb3-55"><a href="#cb3-55" tabindex="-1"></a><span class="co">#&gt; [166] 5.525124e-03 4.552753e-03 3.677235e-03 2.906758e-03 2.245111e-03</span></span>
+<span id="cb3-56"><a href="#cb3-56" tabindex="-1"></a><span class="co">#&gt; [171] 1.691480e-03 1.240796e-03 8.844633e-04 6.113430e-04 4.088241e-04</span></span>
+<span id="cb3-57"><a href="#cb3-57" tabindex="-1"></a><span class="co">#&gt; [176] 2.638781e-04 1.639870e-04 9.786761e-05 5.594208e-05 3.054328e-05</span></span>
+<span id="cb3-58"><a href="#cb3-58" tabindex="-1"></a><span class="co">#&gt; [181] 1.588301e-05 7.843278e-06 3.666475e-06 1.617105e-06 6.705147e-07</span></span>
+<span id="cb3-59"><a href="#cb3-59" tabindex="-1"></a><span class="co">#&gt; [186] 2.603537e-07 9.426222e-08 3.167001e-08 9.820742e-09 2.793406e-09</span></span>
+<span id="cb3-60"><a href="#cb3-60" tabindex="-1"></a><span class="co">#&gt; [191] 7.235868e-10 1.692472e-10 3.538215e-11 6.528551e-12 1.046459e-12</span></span>
+<span id="cb3-61"><a href="#cb3-61" tabindex="-1"></a><span class="co">#&gt; [196] 1.427239e-13 1.610149e-14 1.442349e-15 9.617416e-17 4.242913e-18</span></span>
+<span id="cb3-62"><a href="#cb3-62" tabindex="-1"></a><span class="co">#&gt; [201] 9.288491e-20</span></span>
+<span id="cb3-63"><a href="#cb3-63" tabindex="-1"></a><span class="co">#&gt; </span></span>
+<span id="cb3-64"><a href="#cb3-64" tabindex="-1"></a><span class="co">#&gt; $wald_ci</span></span>
+<span id="cb3-65"><a href="#cb3-65" tabindex="-1"></a><span class="co">#&gt;           [,1]      [,2]</span></span>
+<span id="cb3-66"><a href="#cb3-66" tabindex="-1"></a><span class="co">#&gt; [1,] 0.1167776 0.6232224</span></span>
+<span id="cb3-67"><a href="#cb3-67" tabindex="-1"></a><span class="co">#&gt; [2,] 0.1927776 0.6992224</span></span>
+<span id="cb3-68"><a href="#cb3-68" tabindex="-1"></a><span class="co">#&gt; </span></span>
+<span id="cb3-69"><a href="#cb3-69" tabindex="-1"></a><span class="co">#&gt; $pct_ci</span></span>
+<span id="cb3-70"><a href="#cb3-70" tabindex="-1"></a><span class="co">#&gt; [1] 0.15 0.64</span></span>
+<span id="cb3-71"><a href="#cb3-71" tabindex="-1"></a><span class="co">#&gt; </span></span>
+<span id="cb3-72"><a href="#cb3-72" tabindex="-1"></a><span class="co">#&gt; $zq_ci</span></span>
+<span id="cb3-73"><a href="#cb3-73" tabindex="-1"></a><span class="co">#&gt; [1] 0.1459954 0.6337050</span></span>
+<span id="cb3-74"><a href="#cb3-74" tabindex="-1"></a><span class="co">#&gt; </span></span>
+<span id="cb3-75"><a href="#cb3-75" tabindex="-1"></a><span class="co">#&gt; $scr_ci</span></span>
+<span id="cb3-76"><a href="#cb3-76" tabindex="-1"></a><span class="co">#&gt;            [,1]      [,2]</span></span>
+<span id="cb3-77"><a href="#cb3-77" tabindex="-1"></a><span class="co">#&gt; [1,] 0.09299043 0.5575362</span></span>
+<span id="cb3-78"><a href="#cb3-78" tabindex="-1"></a><span class="co">#&gt; [2,] 0.16715518 0.6142908</span></span></code></pre></div>
+<p>Function <code>snsp2mp</code> outputs estimated differences
+(<code>diff</code>), exact bootstrap mean of the empirical difference
+(<code>btmn</code>), exact bootstrap variance estimate for the empirical
+difference (<code>btva</code>), exact bootstrap distribution of the
+empirical difference (<code>btdist</code>), Wald confidence intervals
+(<code>wald_ci</code>), percentile confidence interval
+(<code>pct_ci</code>), score confidence intervals (<code>scr_ci</code>),
+and an extension of the BTII interval in Zhou and Qin (2005, Statistics
+in Medicine 24, pp 465–477) (<code>zq_ci</code>).</p>
+</div>
+<div id="two-biomarker-unpaired-comparison-in-specificity-at-a-controlled-sensitivity-level-or-sensitivity-at-a-controlled-specificity-level" class="section level2">
+<h2>Two-biomarker unpaired comparison in specificity at a controlled
+sensitivity level (or sensitivity at a controlled specificity
+level)</h2>
+<div class="sourceCode" id="cb4"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb4-1"><a href="#cb4-1" tabindex="-1"></a><span class="do">## simulate biomarker X with 100 cases and 100 controls</span></span>
+<span id="cb4-2"><a href="#cb4-2" tabindex="-1"></a>mkx <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="fu">rnorm</span>(<span class="dv">100</span>,<span class="dv">2</span>,<span class="dv">1</span>),<span class="fu">rnorm</span>(<span class="dv">100</span>,<span class="dv">0</span>,<span class="dv">1</span>))</span>
+<span id="cb4-3"><a href="#cb4-3" tabindex="-1"></a><span class="do">## simulate biomarker Y with 100 cases and 100 controls</span></span>
+<span id="cb4-4"><a href="#cb4-4" tabindex="-1"></a>mky <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="fu">rnorm</span>(<span class="dv">100</span>,<span class="dv">1</span>,<span class="dv">1</span>),<span class="fu">rnorm</span>(<span class="dv">100</span>,<span class="dv">0</span>,<span class="dv">1</span>))</span>
+<span id="cb4-5"><a href="#cb4-5" tabindex="-1"></a><span class="do">## compare specificity at controlled 0.95 sensitivity</span></span>
+<span id="cb4-6"><a href="#cb4-6" tabindex="-1"></a><span class="fu">snsp2mup</span>(mkx, <span class="dv">100</span>, mky, <span class="dv">100</span>, <span class="fl">0.95</span>)</span>
+<span id="cb4-7"><a href="#cb4-7" tabindex="-1"></a><span class="co">#&gt; $diff</span></span>
+<span id="cb4-8"><a href="#cb4-8" tabindex="-1"></a><span class="co">#&gt; [1] 0.4200 0.3725</span></span>
+<span id="cb4-9"><a href="#cb4-9" tabindex="-1"></a><span class="co">#&gt; </span></span>
+<span id="cb4-10"><a href="#cb4-10" tabindex="-1"></a><span class="co">#&gt; $hvar</span></span>
+<span id="cb4-11"><a href="#cb4-11" tabindex="-1"></a><span class="co">#&gt; [1] 0.01353543</span></span>
+<span id="cb4-12"><a href="#cb4-12" tabindex="-1"></a><span class="co">#&gt; </span></span>
+<span id="cb4-13"><a href="#cb4-13" tabindex="-1"></a><span class="co">#&gt; $wald_ci</span></span>
+<span id="cb4-14"><a href="#cb4-14" tabindex="-1"></a><span class="co">#&gt;           [,1]      [,2]</span></span>
+<span id="cb4-15"><a href="#cb4-15" tabindex="-1"></a><span class="co">#&gt; [1,] 0.1919741 0.6480259</span></span>
+<span id="cb4-16"><a href="#cb4-16" tabindex="-1"></a><span class="co">#&gt; [2,] 0.1444741 0.6005259</span></span>
+<span id="cb4-17"><a href="#cb4-17" tabindex="-1"></a><span class="co">#&gt; </span></span>
+<span id="cb4-18"><a href="#cb4-18" tabindex="-1"></a><span class="co">#&gt; $pct_ci</span></span>
+<span id="cb4-19"><a href="#cb4-19" tabindex="-1"></a><span class="co">#&gt; [1] 0.19 0.63</span></span>
+<span id="cb4-20"><a href="#cb4-20" tabindex="-1"></a><span class="co">#&gt; </span></span>
+<span id="cb4-21"><a href="#cb4-21" tabindex="-1"></a><span class="co">#&gt; $zq_ci</span></span>
+<span id="cb4-22"><a href="#cb4-22" tabindex="-1"></a><span class="co">#&gt; [1] 0.1782788 0.6174596</span></span>
+<span id="cb4-23"><a href="#cb4-23" tabindex="-1"></a><span class="co">#&gt; </span></span>
+<span id="cb4-24"><a href="#cb4-24" tabindex="-1"></a><span class="co">#&gt; $scr_ci</span></span>
+<span id="cb4-25"><a href="#cb4-25" tabindex="-1"></a><span class="co">#&gt;           [,1]      [,2]</span></span>
+<span id="cb4-26"><a href="#cb4-26" tabindex="-1"></a><span class="co">#&gt; [1,] 0.1731983 0.5925208</span></span>
+<span id="cb4-27"><a href="#cb4-27" tabindex="-1"></a><span class="co">#&gt; [2,] 0.1304638 0.5552159</span></span></code></pre></div>
+<p>Function <code>snsp2mup</code> outputs estimated differences
+(<code>diff</code>), exact bootstrap variance estimate for the empirical
+difference (<code>hvar</code>), Wald confidence intervals
+(<code>wald_ci</code>), percentile confidence interval
+(<code>pct_ci</code>), score confidence intervals (<code>scr_ci</code>),
+and an extension of the BTII interval in Zhou and Qin (2005, Statistics
+in Medicine 24, pp 465–477) (<code>zq_ci</code>).</p>
+</div>
+<div id="references" class="section level2">
+<h2>References</h2>
+<p>Huang, Y., Parakati, I., Patil, D. H.,and Sanda, M. G. (2023).
+Interval estimation for operating characteristic of continuous
+biomarkers with controlled sensitivity or specificity, <em>Statistica
+Sinica</em> 33, 193–214.</p>
+</div>
+
+
+
+<!-- code folding -->
+
+
+<!-- dynamically load mathjax for compatibility with self-contained -->
+<script>
+  (function () {
+    var script = document.createElement("script");
+    script.type = "text/javascript";
+    script.src  = "https://mathjax.rstudio.com/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML";
+    document.getElementsByTagName("head")[0].appendChild(script);
+  })();
+</script>
+
+</body>
+</html>
