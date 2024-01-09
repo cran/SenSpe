@@ -30,6 +30,7 @@
   Statistics in Medicine 24, pp 465--477).}
 }
 \examples{
+set.seed(1234)
 ## simulate biomarker X with 100 cases and 100 controls
 mkx <- c(rnorm(100,2,1),rnorm(100,0,1))
 ## simulate biomarker Y with 100 cases and 100 controls

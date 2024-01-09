@@ -37,6 +37,7 @@
 }
 \examples{
 ## simulate biomarkers of 100 cases and 100 controls
+set.seed(1234)
 mk <- c(rnorm(100,1,1),rnorm(100,0,1))
 
 ## estimate specificity at controlled 0.95 sensitivity

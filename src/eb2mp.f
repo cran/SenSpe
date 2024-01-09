@@ -8,7 +8,8 @@
       
       integer r,i,j,k,d,drg(2),tmp,a,lg(2),mink,a1,a2
       double precision prb,tri(3)
-      
+      logical lgcl,lgcl1
+
       r=n1-ceiling(dble(n1)*sn0)+1
       diff=0.0d0
       do k=1,2
@@ -24,37 +25,49 @@
             endif
             do i=drg(1),drg(2)
                j=i
-               do while(j .gt. drg(1)-1 .and. mk(k,ord(k,j-1))
-     &              .gt. mk(k,ord(k,j)))
+               lgcl=j .gt. drg(1)-1
+               if(lgcl) lgcl=mk(k,ord(k,j-1)) .gt. mk(k,ord(k,j))
+               do while(lgcl)
                   tmp=ord(k,j)
                   ord(k,j)=ord(k,j-1)
                   ord(k,j-1)=tmp
                   j=j-1
+                  lgcl=j .gt. drg(1)-1
+                  if(lgcl) lgcl=mk(k,ord(k,j-1)) .gt. mk(k,ord(k,j))
                enddo
             enddo
          enddo
          tri(1)=mk(k,ord(k,r))
          i=n1+1
-         do while(i .le. n1+n0 .and. mk(k,ord(k,i)) .lt. tri(1))
+         lgcl=mk(k,ord(k,i)) .lt. tri(1)
+         do while(lgcl)
             diff=diff+dble(3-2*k)
             i=i+1
+            lgcl=i .le. n1+n0
+            if(lgcl) lgcl=mk(k,ord(k,i)) .lt. tri(1)
          enddo
          lg(k)=0
          i=0
          j=n1+1
          do while(i .lt. n1)
             i=i+1
-            do while(j .le. n1+n0 .and.
-     &           mk(k,ord(k,j)) .lt. mk(k,ord(k,i)))
+            lgcl=j .le. n1+n0
+            if(lgcl) lgcl=mk(k,ord(k,j)) .lt. mk(k,ord(k,i))
+            do while(lgcl)
                j=j+1
+               lgcl=j .le. n1+n0
+               if(lgcl) lgcl=mk(k,ord(k,j)) .lt. mk(k,ord(k,i))
             enddo
-            if(j .gt. n1+n0) then
+            if(j .gt. n1+n1) then
                i=n1
             else
                i=i+1
-               do while(i .le. n1 .and. mk(k,ord(k,i)) .le.
-     &              mk(k,ord(k,j)))
+               lgcl=i .le. n1
+               if(lgcl) lgcl=mk(k,ord(k,i)) .le. mk(k,ord(k,j))
+               do while(lgcl)
                   i=i+1
+                  lgcl=i .le. n1
+                  if(lgcl) lgcl=mk(k,ord(k,i)) .le. mk(k,ord(k,j))
                enddo
                i=i-1
             endif
@@ -76,15 +89,20 @@
       enddo
       d=1
       mink=min(lg(1),lg(2))
-      do while(k .eq. 1 .or. k .le. mink .and. btp1(0,3-d)
-     &     .lt. 1.0d0-1.0d-10)
+      lgcl=k .eq. 1
+      if(.not. lgcl) then
+         lgcl=k .le. mink
+         if(lgcl) lgcl=btp1(0,3-d) .lt. 1.0d0-1.0d-10
+      endif
+      do while(lgcl)
          i=1
          if(k .gt. 1) i=grid(1,k-1)+1
          do j=i,grid(1,k)
-            if((k .eq. 1 .or.
-     &           mk(2,ord(1,j)) .gt. mk(2,ord(2,grid(2,k-1))))
-     &           .and. mk(2,ord(1,j)) .le. mk(2,ord(2,grid(2,k))))
-     &           a=a+1
+            lgcl1=k .eq. 1
+            if(.not. lgcl1)
+     &           lgcl1=mk(2,ord(1,j)) .gt. mk(2,ord(2,grid(2,k-1)))
+            if(lgcl1) lgcl1=mk(2,ord(1,j)) .le. mk(2,ord(2,grid(2,k)))
+            if(lgcl1) a=a+1
          enddo
          a=a+a1+a2
          btp1(0,d)=mnprob(r,n1,a,grid(1,k)-a,grid(2,k)-a)
@@ -144,6 +162,11 @@
          
          k=k+1
          d=3-d
+         lgcl=k .eq. 1
+         if(.not. lgcl) then
+            lgcl=k .le. mink
+            if(lgcl) lgcl=btp1(0,3-d) .lt. 1.0d0-1.0d-10
+         endif
       enddo
 
       btmn=tri(1)
@@ -157,17 +180,21 @@
 
       integer a(2),b(2),b1,b2,k,p
       double precision dtmp1,dtmp2,la(3)
+      logical lgcl
 
       b(1)=i
       b(2)=j
       do k=1,2
          a(k)=0
          p=n1+1
-         do while(p .le. n1+n0 .and. mk(k,ord(k,p)) .lt.
-     &        mk(k,ord(k,b(k))))
+         lgcl=p .le. n1+n0
+         if(lgcl) lgcl=mk(k,ord(k,p)) .lt. mk(k,ord(k,b(k)))
+         do while(lgcl)
             if(mk(3-k,ord(k,p)) .ge. mk(3-k,ord(3-k,b(3-k))))
      &           a(k)=a(k)+1
             p=p+1
+            lgcl=p .le. n1+n0
+            if(lgcl) lgcl=mk(k,ord(k,p)) .lt. mk(k,ord(k,b(k)))
          enddo
       enddo
       tri(1)=tri(1)+dble(a(1)-a(2))/dble(n0)*prb
@@ -213,7 +240,6 @@
          return
       endif
       
-         
       la(1)=dlog(dble(a(1)))
       la(2)=dlog(dble(a(2)))
       la(3)=dlog(dble(n0-a(1)-a(2)))
@@ -232,7 +258,6 @@
      &              +dlog(dble(n0-b1-b2+1))+la(2)-la(3)
             endif
             btdist(b1-b2)=btdist(b1-b2)+dexp(dtmp2)*prb
-
          enddo
       enddo
       

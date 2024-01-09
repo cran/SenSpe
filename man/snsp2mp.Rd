@@ -35,6 +35,7 @@
 n1 <- 100
 n0 <- 100
 rho <- 0.5
+set.seed(1234)
 mkx <- rnorm(n1+n0,0,1)
 mky <- rho*mkx + sqrt(1-rho^2)*rnorm(n1+n0,0,1)
 mkx <- mkx + c(rep(2,n1),rep(0,n0))
